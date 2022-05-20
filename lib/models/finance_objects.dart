@@ -1,7 +1,8 @@
 import 'package:uuid/uuid.dart';
+import 'package:flutter_treeview/flutter_treeview.dart';
 
 class Entry {
-  String name;
+  String? name;
   Entry(this.name);
 }
 
@@ -10,10 +11,11 @@ class Account extends Entry {
   Account? parent; // If null, this account is a root
   List<Account> children = [];
   List<Transaction> transactionList = [];
-  Account(String name, {Account? parent}) : super(name) {
-    // ignore: prefer_initializing_formals
+  Account(String? name, double? balance, {Account? parent}) : super(name) {
+    // ignore: prefer_initializing_formals]
     this.parent = parent;
     this.parent?.children.add(this);
+    this.balance = balance ?? 0;
   }
 
   bool isRoot() {
@@ -26,6 +28,19 @@ class Account extends Entry {
 
   void adjustBalance(double cost) {
     balance += cost;
+  }
+
+  Node toNode() {
+    String label = '${name} \$${balance}';
+    return Node(
+      key: name ?? "",
+      label: label,
+      children: children.map((account) => account.toNode()).toList(),
+    );
+  }
+
+  Account copySignature() {
+    return Account(name, balance, parent: parent);
   }
 }
 
